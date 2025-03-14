@@ -11,7 +11,7 @@ namespace FinalProjectConnectFour
         static void Main()
         {
             Console.WriteLine("Start Code");
-            Console.WriteLine("Welcome to Connect Four!");
+            Console.WriteLine("Welcome to Connect Four! Gabriel");
         }
     }
 
