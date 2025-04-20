@@ -116,15 +116,38 @@ namespace FinalProjectConnectFour
     // It serves as a blueprint for other specific player types.
     abstract class Player
     {
+        public string Name { get; set; } // Player's name
+        public char Symbol { get; set; } // Player's symbol (e.g., 'X' or 'O')
 
+        // Constructor to initialize the player's name and symbol
+        protected Player(string name, char symbol)
+        {
+            Name = name;
+            Symbol = symbol;
+        }
+
+        // Abstract method for getting a player's move
+        public abstract int GetMove();
     }
 
     // gpassarelli: HumanPlayer class, represents a human player
     class HumanPlayer : Player
     {
+        public HumanPlayer(string name, char symbol) : base(name, symbol) { }
 
+        // Override the GetMove method to get input from the user
+        public override int GetMove()
+        {
+            Console.WriteLine($"{Name} ({Symbol}), enter column (1-7):");
+            int move;
+            while (!int.TryParse(Console.ReadLine(), out move) || move < 1 || move > 7)
+            {
+                Console.WriteLine("Invalid input. Enter a number between 1 and 7:");
+            }
+            return move - 1; // Return the column index (0-6)
+        }
     }
-    
+
     // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
