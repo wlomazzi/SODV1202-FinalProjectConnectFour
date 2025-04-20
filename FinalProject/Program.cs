@@ -81,10 +81,31 @@ namespace FinalProjectConnectFour
         // gpassarelli: Method to check if a player has won --------------------------------------------------------------------------------------------
         public bool CheckWin(char symbol)
         {
-        
+            // Check horizontal, vertical, and diagonal wins
+            for (int r = 0; r < Rows; r++)
+                for (int c = 0; c < Cols - 3; c++)
+                    if (board[r, c] == symbol && board[r, c + 1] == symbol && board[r, c + 2] == symbol && board[r, c + 3] == symbol)
+                        return true;
+
+            for (int r = 0; r < Rows - 3; r++)
+                for (int c = 0; c < Cols; c++)
+                    if (board[r, c] == symbol && board[r + 1, c] == symbol && board[r + 2, c] == symbol && board[r + 3, c] == symbol)
+                        return true;
+
+            for (int r = 0; r < Rows - 3; r++)
+                for (int c = 0; c < Cols - 3; c++)
+                    if (board[r, c] == symbol && board[r + 1, c + 1] == symbol && board[r + 2, c + 2] == symbol && board[r + 3, c + 3] == symbol)
+                        return true;
+
+            for (int r = 3; r < Rows; r++)
+                for (int c = 0; c < Cols - 3; c++)
+                    if (board[r, c] == symbol && board[r - 1, c + 1] == symbol && board[r - 2, c + 2] == symbol && board[r - 3, c + 3] == symbol)
+                        return true;
+
+            return false; // No winner found
         }
         //---------------------------------------------------------------------------------------------------------------------------------------------
-        
+
     }
  
 
