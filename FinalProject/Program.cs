@@ -107,9 +107,6 @@ namespace FinalProjectConnectFour
         //---------------------------------------------------------------------------------------------------------------------------------------------
 
     }
- 
-
-
 
     // gpassarelli: Player class, abstract base for all types of players ----------------------------------------------------------------------------------------------------
     // The Player class is an abstract base class that defines the shared properties and behaviors of any player in the game — whether it's a human or a computer.
@@ -151,9 +148,6 @@ namespace FinalProjectConnectFour
     // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
-
-
-
     // GameController class, controls the flow of the game
     // wlomazzi: The GameController class is the central coordinator of the game. It manages the game loop, switches turns between players,
     //           checks for victory or draw conditions, and interacts with the GameBoard and Player classes.
@@ -186,19 +180,53 @@ namespace FinalProjectConnectFour
         // gpassarellii: Method to start the game and control its flow - This is the main game loop.
         public void StartGame()
         {
+            bool gameRunning = true;
+            board.DisplayBoard(); // Display the initial empty board - Draw the board on the Screen
+
+            while (gameRunning)
+            {
+                Player currentPlayer = players[currentPlayerIndex]; // Get the current player from GameController
+                int move;
+                bool validMove;
+
+                do
+                {
+                    move = currentPlayer.GetMove(); // Get the move from the current player
+                    validMove = board.DropPiece(move, currentPlayer.Symbol); // Drop the piece on the board
+                    if (!validMove)
+                        Console.WriteLine("Column full! Try again."); // If the column is full, ask to try again
+                } while (!validMove);
+
+                board.DisplayBoard(); // Display the updated board
+                if (board.CheckWin(currentPlayer.Symbol)) // Check if the current player won
+                {
+                    Console.WriteLine($"{currentPlayer.Name} ({currentPlayer.Symbol}) wins!"); // Display the winner
+                    gameRunning = false; // End the game
+                }
+                else if (IsBoardFull()) // Check if the board is full (draw)
+                {
+                    Console.WriteLine("It's a draw!"); // Display a draw message
+                    gameRunning = false; // End the game
+                }
+                else
+                {
+                    currentPlayerIndex = (currentPlayerIndex + 1) % 2; // Switch to the other player
+                }
+            }
         }
 
         // gpassarelli: Method to check if the board is full (no more moves)
         private bool IsBoardFull()
         {
+            for (int i = 0; i < 7; i++)
+            {
+                if (board.DropPiece(i, ' ')) return false; // If there is an empty spot, the board is not full
+            }
+            return true; // If no empty spots, the board is full
         }
     }
 
-
-
-
-
-    // wlomazzi: Program class, entry point of the application
+        // wlomazzi: Program class, entry point of the application
     class Program
     {
         static void Main()
