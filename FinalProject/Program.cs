@@ -28,7 +28,7 @@ namespace FinalProjectConnectFour
     class GameBoard
     {
         // Size of the array
-        private char[,] board; // 2D array to represent the board
+        protected char[,] board; // 2D array to represent the board
         private const int Rows = 6; // Number of rows in the board
         private const int Cols = 7; // Number of columns in the board
 
@@ -58,6 +58,21 @@ namespace FinalProjectConnectFour
                 }
             }
             return false; // If the column is full, return false
+        }
+
+
+        // wlomazzi: Creates a deep copy of the current board state
+        public GameBoard Clone()
+        {
+            GameBoard newBoard = new GameBoard();
+            for (int r = 0; r < 6; r++)
+            {
+                for (int c = 0; c < 7; c++)
+                {
+                    newBoard.board[r, c] = this.board[r, c];
+                }
+            }
+            return newBoard;
         }
 
         // wlomazzi: Method to display the current board in the console -> Prints the board to the console in a formatted way.
@@ -104,6 +119,12 @@ namespace FinalProjectConnectFour
 
             return false; // No winner found
         }
+
+        // wlomazzi: Method to check if a column has at least one empty space (for validation or AI)
+        public bool IsColumnAvailable(int column)
+        {
+            return board[0, column] == ' ';
+        }
         //---------------------------------------------------------------------------------------------------------------------------------------------
 
     }
@@ -145,6 +166,57 @@ namespace FinalProjectConnectFour
         }
     }
 
+    // wlomazzi: ComputerPlayer class, represents a simple AI player
+
+    class ComputerPlayer : Player
+    {
+        private Random rand;
+        private GameBoard board;
+
+        public ComputerPlayer(string name, char symbol, GameBoard gameBoard) : base(name, symbol)
+        {
+            rand = new Random();
+            board = gameBoard;
+        }
+
+        // Randomly chooses a valid column
+        public override int GetMove()
+        {
+            Console.WriteLine($"{Name} ({Symbol}) is thinking...");
+            System.Threading.Thread.Sleep(1000);
+
+            List<int> availableColumns = new List<int>();
+
+            for (int col = 0; col < 7; col++)
+            {
+                if (board.IsColumnAvailable(col))
+                {
+                    availableColumns.Add(col);
+
+                    // Simulates the temporary board
+                    GameBoard tempBoard = board.Clone();
+                    tempBoard.DropPiece(col, Symbol);
+
+                    // Check if this move wins the game
+                    if (tempBoard.CheckWin(Symbol))
+                    {
+                        Console.WriteLine($"⚡ {Name} sees a winning move in column {col + 1}!");
+                        return col;
+                    }
+                }
+            }
+
+            // If there is no winning move, play randomly
+            if (availableColumns.Count == 0)
+                return -1;
+
+            return availableColumns[rand.Next(availableColumns.Count)];
+        }
+
+
+
+    }
+
     // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
@@ -169,13 +241,33 @@ namespace FinalProjectConnectFour
         */
         public GameController()
         {
-            board = new GameBoard(); // Create a new game board
-            players = new Player[2] {
-                new HumanPlayer("Player 1", 'X'), // Create Player 1
-                new HumanPlayer("Player 2", 'O')  // Create Player 2
-            };
-            currentPlayerIndex = 0; // Player 1 starts
+            board = new GameBoard();
+
+            Console.WriteLine("Choose Game Mode:");
+            Console.WriteLine("1. Player vs Player");
+            Console.WriteLine("2. Player vs Computer");
+
+            string choice = Console.ReadLine();
+
+            if (choice == "2")
+            {
+                players = new Player[2] {
+                new HumanPlayer("Player", 'X'),
+                new ComputerPlayer("Computer", 'O', board)
+                };
+            }
+            else
+            {
+                players = new Player[2] {
+                new HumanPlayer("Player 1", 'X'),
+                new HumanPlayer("Player 2", 'O')
+                };
+            }
+
+            currentPlayerIndex = 0;
         }
+
+
 
         // gpassarellii: Method to start the game and control its flow - This is the main game loop.
         public void StartGame()
@@ -215,18 +307,22 @@ namespace FinalProjectConnectFour
             }
         }
 
+
         // gpassarelli: Method to check if the board is full (no more moves)
         private bool IsBoardFull()
         {
             for (int i = 0; i < 7; i++)
             {
-                if (board.DropPiece(i, ' ')) return false; // If there is an empty spot, the board is not full
+                if (board.IsColumnAvailable(i))
+                    return false;
             }
-            return true; // If no empty spots, the board is full
+            return true;
         }
+
+
     }
 
-        // wlomazzi: Program class, entry point of the application
+    // wlomazzi: Program class, entry point of the application
     class Program
     {
         static void Main()
